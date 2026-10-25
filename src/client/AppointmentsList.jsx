@@ -22,9 +22,13 @@ function AppointmentCard({ apt, isPast }) {
         {needsConfirm && (
           <div className="bg-amber-50 border-b border-amber-100 px-4 py-2.5 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-amber-700 text-xs font-medium">
-              <Bell size={13} />
-              Your appointment is tomorrow — please confirm!
-            </div>
+  <Bell size={13} />
+  {getRelativeDate(apt.date) === 'Today'
+    ? "Today's appointment — please confirm!"
+    : getRelativeDate(apt.date) === 'Tomorrow'
+      ? "Tomorrow's appointment — please confirm!"
+      : `Appointment on ${getRelativeDate(apt.date)} — please confirm!`}
+</div>
             <button
               onClick={() => confirmAttendance(apt.id)}
               className="text-xs font-semibold text-green-700 hover:underline shrink-0"
