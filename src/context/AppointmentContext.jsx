@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { SEED_APPOINTMENTS } from '../data/seed';
-
+import { getTodayStr, isFuture } from '../utils/dateHelpers';
 const STORAGE_KEY = 'nutricare_appointments_v2';
 
 function loadState() {
@@ -61,7 +61,7 @@ export function AppointmentProvider({ children }) {
     saveState(appointments);
   }, [appointments]);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getTodayStr();
 
   function isSlotTaken(date, time, excludeId = null) {
     return appointments.some(
@@ -109,15 +109,15 @@ export function AppointmentProvider({ children }) {
   });
 
   const upcomingAppointments = sorted.filter(
-    (a) => a.status === 'Booked' && `${a.date}T${a.time}` >= `${today}T00:00`
-  );
+  (a) => a.status === 'Booked' && isFuture(a.date, a.time)
+);
 
-  const pastAppointments = sorted.filter(
-    (a) =>
-      a.status === 'Done' ||
-      a.status === 'No-show' ||
-      (a.status === 'Booked' && `${a.date}T${a.time}` < `${today}T00:00`)
-  );
+const pastAppointments = sorted.filter(
+  (a) =>
+    a.status === 'Done' ||
+    a.status === 'No-show' ||
+    (a.status === 'Booked' && !isFuture(a.date, a.time))
+);
 
   const todayAppointments = sorted.filter((a) => a.date === today);
 
